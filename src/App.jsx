@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { BrowserRouter, Routes, Route, Link, useSearchParams } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
@@ -20,6 +19,16 @@ const WEIGHTS = {
   25: 10,
   30: 1,
 };
+
+const SEGMENT_COLORS = [
+  "#e5e7eb",
+  "#dbeafe",
+  "#dcfce7",
+  "#fef3c7",
+  "#fee2e2",
+  "#ede9fe",
+  "#fce7f3",
+];
 
 function generateToken(length = 10) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -99,16 +108,35 @@ function badgeStyle() {
 
 function Header() {
   return (
-    <div style={{ ...cardStyle(), display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
+    <div
+      style={{
+        ...cardStyle(),
+        display: "flex",
+        gap: 10,
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
       <div>
         <div style={{ fontSize: 26, fontWeight: 800 }}>Roleta de Premiação</div>
-        <div style={{ color: "#6b7280", marginTop: 4 }}>Admin + cliente com Supabase</div>
+        <div style={{ color: "#6b7280", marginTop: 4 }}>
+          Admin + cliente com Supabase
+        </div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <Link to="/" style={{ textDecoration: "none" }}><button style={{ ...buttonStyle(false), width: "auto" }}>Início</button></Link>
-        <Link to="/admin" style={{ textDecoration: "none" }}><button style={{ ...buttonStyle(false), width: "auto" }}>Admin</button></Link>
-        <Link to="/roleta" style={{ textDecoration: "none" }}><button style={{ ...buttonStyle(false), width: "auto" }}>Roleta</button></Link>
-        <Link to="/setup" style={{ textDecoration: "none" }}><button style={{ ...buttonStyle(false), width: "auto" }}>Setup</button></Link>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <button style={{ ...buttonStyle(false), width: "auto" }}>Início</button>
+        </Link>
+        <Link to="/admin" style={{ textDecoration: "none" }}>
+          <button style={{ ...buttonStyle(false), width: "auto" }}>Admin</button>
+        </Link>
+        <Link to="/roleta" style={{ textDecoration: "none" }}>
+          <button style={{ ...buttonStyle(false), width: "auto" }}>Roleta</button>
+        </Link>
+        <Link to="/setup" style={{ textDecoration: "none" }}>
+          <button style={{ ...buttonStyle(false), width: "auto" }}>Setup</button>
+        </Link>
       </div>
     </div>
   );
@@ -128,13 +156,19 @@ function Layout({ children }) {
 function HomePage() {
   return (
     <Layout>
-      <div style={{ ...cardStyle() }}>
+      <div style={cardStyle()}>
         <h2 style={{ marginTop: 0 }}>Sistema pronto</h2>
         <p>Rotas:</p>
         <div style={{ lineHeight: 1.8 }}>
-          <div><strong>/admin</strong> → painel protegido por login do Supabase</div>
-          <div><strong>/roleta?token=CODIGO</strong> → página do cliente para usar 1 vez</div>
-          <div><strong>/setup</strong> → instruções de configuração</div>
+          <div>
+            <strong>/admin</strong> → painel protegido por login do Supabase
+          </div>
+          <div>
+            <strong>/roleta?token=CODIGO</strong> → página do cliente para usar 1 vez
+          </div>
+          <div>
+            <strong>/setup</strong> → instruções de configuração
+          </div>
         </div>
       </div>
     </Layout>
@@ -165,9 +199,25 @@ function AdminLogin({ onLogged }) {
     <Layout>
       <div style={{ ...cardStyle(), maxWidth: 520, margin: "0 auto" }}>
         <h2 style={{ marginTop: 0 }}>Entrar no admin</h2>
-        <input style={inputStyle()} type="email" placeholder="Seu e-mail admin" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input style={inputStyle()} type="password" placeholder="Sua senha" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button style={buttonStyle(true)} onClick={handleLogin} disabled={loading || !email || !password}>
+        <input
+          style={inputStyle()}
+          type="email"
+          placeholder="Seu e-mail admin"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          style={inputStyle()}
+          type="password"
+          placeholder="Sua senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          style={buttonStyle(true)}
+          onClick={handleLogin}
+          disabled={loading || !email || !password}
+        >
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </div>
@@ -195,7 +245,9 @@ function AdminPage() {
       if (data.session) fetchTokens();
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setAuthorized(!!session);
       setChecked(true);
       if (session) fetchTokens();
@@ -215,7 +267,7 @@ function AdminPage() {
 
     if (error) {
       console.error(error);
-      alert("Erro ao carregar tokens. Veja se a tabela 'tokens' foi criada no Supabase.");
+      alert("Erro ao carregar tokens.");
       return;
     }
     setTokens(data || []);
@@ -276,12 +328,23 @@ function AdminPage() {
       <div style={cardStyle()}>
         <h2 style={{ marginTop: 0 }}>Painel admin</h2>
         <label>Nome do participante</label>
-        <input style={inputStyle()} placeholder="Ex.: Maria" value={participantName} onChange={(e) => setParticipantName(e.target.value)} />
-        <button style={buttonStyle(true)} onClick={createToken} disabled={!participantName.trim() || creating}>
+        <input
+          style={inputStyle()}
+          placeholder="Ex.: Maria"
+          value={participantName}
+          onChange={(e) => setParticipantName(e.target.value)}
+        />
+        <button
+          style={buttonStyle(true)}
+          onClick={createToken}
+          disabled={!participantName.trim() || creating}
+        >
           {creating ? "Gerando..." : "Gerar token para a roleta"}
         </button>
         <div style={{ height: 10 }} />
-        <button style={buttonStyle(false)} onClick={handleLogout}>Sair do admin</button>
+        <button style={buttonStyle(false)} onClick={handleLogout}>
+          Sair do admin
+        </button>
       </div>
 
       <div style={cardStyle()}>
@@ -294,7 +357,14 @@ function AdminPage() {
       </div>
 
       <div style={cardStyle()}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
           <h3 style={{ marginTop: 0, marginBottom: 12 }}>Tokens gerados</h3>
           <button style={{ ...buttonStyle(false), width: "auto" }} onClick={fetchTokens}>
             Atualizar
@@ -303,61 +373,161 @@ function AdminPage() {
 
         {loadingTokens && <p>Carregando...</p>}
 
-        {!loadingTokens && tokens.length === 0 && (
-          <p>Nenhum token criado ainda.</p>
-        )}
+        {!loadingTokens && tokens.length === 0 && <p>Nenhum token criado ainda.</p>}
 
-        {!loadingTokens && tokens.map((item) => (
-          <div key={item.id} style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 12, marginBottom: 12 }}>
-            <div style={{ fontWeight: 800 }}>{item.name}</div>
-            <div style={{ color: "#6b7280", marginTop: 4 }}>Token: {item.token}</div>
-            <div style={{ color: "#6b7280", marginTop: 4 }}>
-              Status: {item.used ? `Usado • R$ ${item.prize}` : "Disponível"}
+        {!loadingTokens &&
+          tokens.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 14,
+                padding: 12,
+                marginBottom: 12,
+              }}
+            >
+              <div style={{ fontWeight: 800 }}>{item.name}</div>
+              <div style={{ color: "#6b7280", marginTop: 4 }}>Token: {item.token}</div>
+              <div style={{ color: "#6b7280", marginTop: 4 }}>
+                Status: {item.used ? `Usado • R$ ${item.prize}` : "Disponível"}
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                <button
+                  style={{ ...buttonStyle(false), width: "auto" }}
+                  onClick={() => copyLink(item.token)}
+                >
+                  Copiar link
+                </button>
+                <a
+                  href={`/roleta?token=${item.token}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ textDecoration: "none" }}
+                >
+                  <button style={{ ...buttonStyle(false), width: "auto" }}>
+                    Abrir página do cliente
+                  </button>
+                </a>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-              <button style={{ ...buttonStyle(false), width: "auto" }} onClick={() => copyLink(item.token)}>Copiar link</button>
-              <a href={`/roleta?token=${item.token}`} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
-                <button style={{ ...buttonStyle(false), width: "auto" }}>Abrir página do cliente</button>
-              </a>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     </Layout>
   );
 }
 
-function WheelVisual({ spinning, result }) {
+function buildSegments() {
+  const segmentCount = PRIZES.length;
+  const segmentAngle = 360 / segmentCount;
+  return PRIZES.map((value, index) => ({
+    value,
+    index,
+    start: index * segmentAngle,
+    end: (index + 1) * segmentAngle,
+    center: index * segmentAngle + segmentAngle / 2,
+    color: SEGMENT_COLORS[index % SEGMENT_COLORS.length],
+  }));
+}
+
+function WheelVisual({ spinning, rotation, result }) {
+  const segments = useMemo(() => buildSegments(), []);
+  const wheelSize = 320;
+
   return (
     <div style={{ ...cardStyle(), textAlign: "center" }}>
-      <div
-        style={{
-          width: 280,
-          height: 280,
-          margin: "0 auto 16px",
-          borderRadius: "50%",
-          border: "10px solid #111827",
-          background:
-            "conic-gradient(#dbeafe 0deg 51deg, #fee2e2 51deg 102deg, #dcfce7 102deg 153deg, #fef3c7 153deg 204deg, #ede9fe 204deg 255deg, #fce7f3 255deg 306deg, #e5e7eb 306deg 360deg)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 800,
-          fontSize: 28,
-          transform: spinning ? "rotate(1440deg)" : "rotate(0deg)",
-          transition: spinning ? "transform 4s ease-out" : "none",
-        }}
-      >
-        R$
+      <div style={{ position: "relative", width: wheelSize, margin: "0 auto 16px" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: -18,
+            transform: "translateX(-50%)",
+            width: 0,
+            height: 0,
+            borderLeft: "16px solid transparent",
+            borderRight: "16px solid transparent",
+            borderTop: "0 solid transparent",
+            borderBottom: "28px solid #111827",
+            zIndex: 5,
+          }}
+        />
+
+        <div
+          style={{
+            width: wheelSize,
+            height: wheelSize,
+            borderRadius: "50%",
+            border: "10px solid #111827",
+            position: "relative",
+            overflow: "hidden",
+            margin: "0 auto",
+            background: `conic-gradient(${segments
+              .map((segment) => `${segment.color} ${segment.start}deg ${segment.end}deg`)
+              .join(", ")})`,
+            transform: `rotate(${rotation}deg)`,
+            transition: spinning ? "transform 20s cubic-bezier(0.12, 0.8, 0.12, 1)" : "none",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          }}
+        >
+          {segments.map((segment) => (
+            <div
+              key={segment.value}
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: `translate(-50%, -50%) rotate(${segment.center}deg) translateY(-108px) rotate(90deg)`,
+                fontWeight: 800,
+                fontSize: 18,
+                color: "#111827",
+                textShadow: "0 1px 0 rgba(255,255,255,0.6)",
+              }}
+            >
+              R$ {segment.value}
+            </div>
+          ))}
+
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 70,
+              height: 70,
+              borderRadius: "50%",
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 800,
+              fontSize: 24,
+              boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
+            }}
+          >
+            PIX
+          </div>
+        </div>
       </div>
+
       <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
         {PRIZES.map((value) => (
-          <span key={value} style={badgeStyle()}>R$ {value}</span>
+          <span key={value} style={badgeStyle()}>
+            R$ {value}
+          </span>
         ))}
       </div>
+
       {result !== null && <div style={{ marginTop: 16, fontSize: 22, fontWeight: 800 }}>Prêmio: R$ {result}</div>}
     </div>
   );
+}
+
+function getResultMessage(prize) {
+  if (prize === 0) {
+    return "Infelizmente não deu desta vez. Tente na próxima.";
+  }
+  return `Parabéns! Você ganhou R$ ${prize}. Prazo de 48 horas para receber no seu PIX.`;
 }
 
 function RoletaPage() {
@@ -366,6 +536,8 @@ function RoletaPage() {
   const [loading, setLoading] = useState(true);
   const [record, setRecord] = useState(null);
   const [spinning, setSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const segments = useMemo(() => buildSegments(), []);
 
   async function fetchToken() {
     if (!supabase) {
@@ -403,14 +575,21 @@ function RoletaPage() {
     if (!record || record.used || spinning || !supabase) return;
 
     setSpinning(true);
-    const prize = weightedRandom();
+
+    const chosenPrize = weightedRandom();
+    const chosenSegment = segments.find((segment) => segment.value === chosenPrize);
+    const targetAngle = chosenSegment ? chosenSegment.center : 0;
+    const fullTurns = 360 * 12;
+    const finalRotation = rotation + fullTurns + (360 - targetAngle);
+
+    setRotation(finalRotation);
 
     setTimeout(async () => {
       const { data, error } = await supabase
         .from("tokens")
         .update({
           used: true,
-          prize,
+          prize: chosenPrize,
           used_at: new Date().toISOString(),
         })
         .eq("token", tokenParam)
@@ -433,16 +612,13 @@ function RoletaPage() {
       }
 
       setRecord(data);
-    }, 4000);
+      alert(getResultMessage(chosenPrize));
+    }, 20000);
   }
 
   return (
     <Layout>
-      {!tokenParam && (
-        <div style={cardStyle()}>
-          Abra esta página com um token válido.
-        </div>
-      )}
+      {!tokenParam && <div style={cardStyle()}>Abra esta página com um token válido.</div>}
 
       {loading && <div style={cardStyle()}>Carregando...</div>}
 
@@ -457,14 +633,18 @@ function RoletaPage() {
         <>
           <div style={cardStyle()}>
             <h2 style={{ marginTop: 0 }}>Sua roleta de prêmio</h2>
-            <div><strong>Participante:</strong> {record.name}</div>
-            <div style={{ marginTop: 6, color: "#6b7280" }}><strong>Token:</strong> {record.token}</div>
+            <div>
+              <strong>Participante:</strong> {record.name}
+            </div>
+            <div style={{ marginTop: 6, color: "#6b7280" }}>
+              <strong>Token:</strong> {record.token}
+            </div>
             <div style={{ marginTop: 6, color: "#6b7280" }}>
               <strong>Status:</strong> {record.used ? "Roleta já utilizada" : "Disponível para 1 giro"}
             </div>
           </div>
 
-          <WheelVisual spinning={spinning} result={record.prize ?? null} />
+          <WheelVisual spinning={spinning} rotation={rotation} result={record.prize ?? null} />
 
           <div style={cardStyle()}>
             {!record.used ? (
@@ -474,7 +654,7 @@ function RoletaPage() {
             ) : (
               <div>
                 <div style={{ fontSize: 24, fontWeight: 800 }}>Roleta concluída</div>
-                <div style={{ marginTop: 10 }}>Seu prêmio foi: <strong>R$ {record.prize}</strong></div>
+                <div style={{ marginTop: 10 }}>{getResultMessage(record.prize)}</div>
               </div>
             )}
           </div>
@@ -492,10 +672,20 @@ function SetupPage() {
         <ol style={{ lineHeight: 1.8, paddingLeft: 20 }}>
           <li>Crie um projeto no Supabase.</li>
           <li>Em Authentication, crie seu usuário admin com e-mail e senha.</li>
-          <li>No Netlify, adicione <strong>VITE_SUPABASE_URL</strong> e <strong>VITE_SUPABASE_ANON_KEY</strong>.</li>
+          <li>
+            No Netlify, adicione <strong>VITE_SUPABASE_URL</strong> e <strong>VITE_SUPABASE_ANON_KEY</strong>.
+          </li>
           <li>Crie a tabela <strong>tokens</strong>.</li>
         </ol>
-        <div style={{ background: "#f3f4f6", borderRadius: 12, padding: 12, overflowX: "auto", whiteSpace: "pre-wrap" }}>
+        <div
+          style={{
+            background: "#f3f4f6",
+            borderRadius: 12,
+            padding: 12,
+            overflowX: "auto",
+            whiteSpace: "pre-wrap",
+          }}
+        >
 {`create table if not exists public.tokens (
   id bigint generated by default as identity primary key,
   name text not null,
